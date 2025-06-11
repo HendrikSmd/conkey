@@ -5,6 +5,8 @@
 #include "conkey/lexer/lexer.hpp"
 #include <vector>
 #include <sstream>
+#include <random>
+#include <array>
 
 const char* MINIMAL_TOKEN_TEXT_A = R"(
     { , } ( ) * / + - == != < > = let fn if else true false 123 abc
@@ -241,7 +243,7 @@ const char* PROGRAM_C = R"(
     let result = true != false;
 )";
 
-TEST(LexerTest, BooleanExporessionsAndComparisons) {
+TEST(LexerTest, BooleanExpressionsAndComparisons) {
     std::vector<Conkey::Lexer::Token> expectedTokens = {
         {Conkey::Lexer::TokenType::LET, "let"},
         {Conkey::Lexer::TokenType::IDENT, "isGreater"},
@@ -354,7 +356,7 @@ const char* INVALID_PROGRAM_A = R"(
     let @x = 10;
 )";
 
-TEST(LexerTest, InvalidProgramTest) {
+TEST(LexerTest, InvalidProgramTestA) {
     std::vector<Conkey::Lexer::Token> expectedTokens = {
         {Conkey::Lexer::TokenType::LET, "let"},
         {Conkey::Lexer::TokenType::ILLEGAL, "@"},
@@ -368,6 +370,132 @@ TEST(LexerTest, InvalidProgramTest) {
     std::istringstream input(INVALID_PROGRAM_A);
     Conkey::Lexer::Lexer lexer(input, "invalid_program_a");
 
+    while (!lexer.noMoreTokens()) {
+        receivedTokens.push_back(lexer.tryNextToken());
+    }
+    if (receivedTokens.back().type == Conkey::Lexer::TokenType::END_OF_FILE) {
+        receivedTokens.resize(receivedTokens.size() - 1);
+    }
+
+    ASSERT_THAT(receivedTokens, expectedTokens);
+}
+
+const char* INVALID_PROGRAM_B = R"(
+    let identifier = 800 % 56;
+)";
+
+TEST(LexerTest, InvalidProgramTestB) {
+    std::vector<Conkey::Lexer::Token> expectedTokens = {
+        {Conkey::Lexer::TokenType::LET, "let"},
+        {Conkey::Lexer::TokenType::IDENT, "identifier"},
+        {Conkey::Lexer::TokenType::ASSIGN, "="},
+        {Conkey::Lexer::TokenType::INT, "800"},
+        {Conkey::Lexer::TokenType::ILLEGAL, "%"},
+        {Conkey::Lexer::TokenType::INT, "56"},
+        {Conkey::Lexer::TokenType::SEMICOLON, ";"}
+    };
+
+    std::vector<Conkey::Lexer::Token> receivedTokens;
+    std::istringstream input(INVALID_PROGRAM_B);
+    Conkey::Lexer::Lexer lexer(input, "invalid_program_b");
+
+    while (!lexer.noMoreTokens()) {
+        receivedTokens.push_back(lexer.tryNextToken());
+    }
+    if (receivedTokens.back().type == Conkey::Lexer::TokenType::END_OF_FILE) {
+        receivedTokens.resize(receivedTokens.size() - 1);
+    }
+
+    ASSERT_THAT(receivedTokens, expectedTokens);
+}
+
+const char* WHITESPACES = R"(
+
+
+
+
+
+
+
+                                    )";
+
+TEST(LexerTest, OnlyWhitespaceTest) {
+    std::istringstream input(WHITESPACES);
+    Conkey::Lexer::Lexer lexer(input, "whitespaces");
+    EXPECT_EQ(lexer.tryNextToken().type, Conkey::Lexer::TokenType::END_OF_FILE);
+    EXPECT_TRUE(lexer.noMoreTokens());
+}
+
+TEST(LexerTest, RandomFormattingTest) {
+    std::vector<Conkey::Lexer::Token> expectedTokens = {
+        {Conkey::Lexer::TokenType::LET, "let"},
+        {Conkey::Lexer::TokenType::IDENT, "five"},
+        {Conkey::Lexer::TokenType::ASSIGN, "="},
+        {Conkey::Lexer::TokenType::INT, "5"},
+        {Conkey::Lexer::TokenType::SEMICOLON, ";"},
+        {Conkey::Lexer::TokenType::LET, "let"},
+        {Conkey::Lexer::TokenType::IDENT, "ten"},
+        {Conkey::Lexer::TokenType::ASSIGN, "="},
+        {Conkey::Lexer::TokenType::INT, "10"},
+        {Conkey::Lexer::TokenType::SEMICOLON, ";"},
+        {Conkey::Lexer::TokenType::LET, "let"},
+        {Conkey::Lexer::TokenType::IDENT, "add"},
+        {Conkey::Lexer::TokenType::ASSIGN, "="},
+        {Conkey::Lexer::TokenType::LPAREN, "("},
+        {Conkey::Lexer::TokenType::IDENT, "x"},
+        {Conkey::Lexer::TokenType::COMMA, ","},
+        {Conkey::Lexer::TokenType::IDENT, "y"},
+        {Conkey::Lexer::TokenType::RPAREN, ")"},
+        {Conkey::Lexer::TokenType::LBRACE, "{"},
+        {Conkey::Lexer::TokenType::RETURN, "return"},
+        {Conkey::Lexer::TokenType::IDENT, "x"},
+        {Conkey::Lexer::TokenType::PLUS, "+"},
+        {Conkey::Lexer::TokenType::IDENT, "y"},
+        {Conkey::Lexer::TokenType::SEMICOLON, ";"},
+        {Conkey::Lexer::TokenType::RBRACE, "}"},
+        {Conkey::Lexer::TokenType::SEMICOLON, ";"},
+        {Conkey::Lexer::TokenType::LET, "let"},
+        {Conkey::Lexer::TokenType::IDENT, "result"},
+        {Conkey::Lexer::TokenType::ASSIGN, "="},
+        {Conkey::Lexer::TokenType::IDENT, "add"},
+        {Conkey::Lexer::TokenType::LPAREN, "("},
+        {Conkey::Lexer::TokenType::INT, "5"},
+        {Conkey::Lexer::TokenType::COMMA, ","},
+        {Conkey::Lexer::TokenType::INT, "10"},
+        {Conkey::Lexer::TokenType::RPAREN, ")"},
+        {Conkey::Lexer::TokenType::SEMICOLON, ";"},
+        {Conkey::Lexer::TokenType::SEMICOLON, ";"},
+        {Conkey::Lexer::TokenType::LET, "let"},
+        {Conkey::Lexer::TokenType::IDENT, "result"},
+        {Conkey::Lexer::TokenType::ASSIGN, "="},
+        {Conkey::Lexer::TokenType::IDENT, "add"},
+        {Conkey::Lexer::TokenType::LPAREN, "("},
+        {Conkey::Lexer::TokenType::IDENT, "five"},
+        {Conkey::Lexer::TokenType::COMMA, ","},
+        {Conkey::Lexer::TokenType::IDENT, "ten"},
+        {Conkey::Lexer::TokenType::RPAREN, ")"},
+        {Conkey::Lexer::TokenType::SEMICOLON, ";"},
+    };
+
+    std::array<char, 3> whitespaces = {' ', '\t', '\n'};
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+
+    std::uniform_int_distribution<> amountDist(1, 5);
+    std::uniform_int_distribution<> typeDist(0, whitespaces.size() - 1);
+
+    std::stringstream ss;
+    for (const auto& token : expectedTokens) {
+        int amount = amountDist(gen);
+        char whitespace = whitespaces[typeDist(gen)];
+
+        ss << std::string(amount, whitespace) << token.literal;
+    }
+
+    std::vector<Conkey::Lexer::Token> receivedTokens;
+    std::istringstream input(ss.str());
+    Conkey::Lexer::Lexer lexer(input, "random_format_program");
     while (!lexer.noMoreTokens()) {
         receivedTokens.push_back(lexer.tryNextToken());
     }

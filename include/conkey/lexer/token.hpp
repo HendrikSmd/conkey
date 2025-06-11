@@ -6,7 +6,7 @@
 
 namespace Conkey::Lexer {
 
-    enum class TokenType {
+    enum class TokenType : unsigned char {
         // Special tokens
         ILLEGAL,
         END_OF_FILE,
