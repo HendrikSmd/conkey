@@ -1,18 +1,27 @@
 #include "conkey/parser/parser.hpp"
 
+#include <functional>
 #include<memory>
 #include <stdexcept>
 
 #include "conkey/lexer/lexer.hpp"
 #include "conkey/lexer/token.hpp"
 #include "conkey/parser/ast/ast_base.hpp"
+#include "conkey/parser/ast/expressions/identifier_expression.hpp"
 #include "conkey/parser/ast/program.hpp"
+#include "conkey/parser/ast/statements/expression_statement.hpp"
 #include "conkey/parser/ast/statements/let_statement.hpp"
+#include "conkey/parser/ast/statements/return_statement.hpp"
 
 namespace Conkey::Parser {
 
     Parser::Parser(Lexer::Lexer& lexer) :
-        lexer_(lexer) {
+        lexer_(lexer),
+        prefixParseFns_({
+            {Lexer::TokenType::IDENT, [this](){ return parseIdentifier(); }},
+            {Lexer::TokenType::INT, [this](){ return parseIntegerLiteral(); }}
+        })
+    {
             nextToken();
     };
 
@@ -49,8 +58,10 @@ namespace Conkey::Parser {
         switch(currentToken_.type) {
             case Lexer::TokenType::LET:
                 return parseLetStatement();
+            case Lexer::TokenType::RETURN:
+                return parseReturnStatement();
             default:
-                return nullptr;
+                return parseExpressionStatement();
         }
 
         return nullptr;
@@ -61,8 +72,8 @@ namespace Conkey::Parser {
         expectTokenType(Lexer::TokenType::LET);
         nextToken();
 
-        letPtr->identifier_ = parseIdentifier();
-
+        Identifier* rawIdentPtr = static_cast<Identifier*>(parseIdentifier().release());
+        letPtr->identifier_ = IdentifierPtr(rawIdentPtr);
         expectTokenType(Lexer::TokenType::ASSIGN);
         nextToken();
 
@@ -74,11 +85,43 @@ namespace Conkey::Parser {
         return letPtr;
     }
 
-    IdentifierPtr Parser::parseIdentifier() {
+    ReturnStatementPtr Parser::parseReturnStatement() {
+        ReturnStatementPtr returnStmntPtr = std::make_unique<ReturnStatement>();
+
+        expectTokenType(Lexer::TokenType::RETURN);
+        nextToken();
+
+        // Parse Expression here
+
+        expectTokenType(Lexer::TokenType::SEMICOLON);
+        nextToken();
+
+        return returnStmntPtr;
+    }
+
+    ExpressionStatementPtr Parser::parseExpressionStatement() {
+        ExpressionStatementPtr exprStmntPtr = std::make_unique<ExpressionStatement>();
+
+        exprStmntPtr->value_ = parseExpression(OperatorPrecedences::LOWEST);
+
+        expectTokenType(Lexer::TokenType::SEMICOLON);
+        nextToken();
+
+        return exprStmntPtr;
+    }
+
+    ExpressionPtr Parser::parseExpression(OperatorPrecedences prec) {
+
+    }
+
+    ExpressionPtr Parser::parseIdentifier() {
         expectTokenType(Lexer::TokenType::IDENT);
         IdentifierPtr identPtr = std::make_unique<Identifier>(std::move(currentToken_.literal));
-        nextToken();
         return identPtr;
+    }
+
+    ExpressionPtr Parser::parseIntegerLiteral() {
+
     }
 
 
