@@ -17,13 +17,13 @@ FetchContent_MakeAvailable(googletest)
 file(GLOB_RECURSE
      Sources
      src/lexer/*.cpp
+     src/parser/*.cpp
 )
 
 file(GLOB_RECURSE
      Test_Sources
      test/*.cpp
 )
-
 enable_testing()
 
 add_executable(conkey src/main.cpp ${Sources})

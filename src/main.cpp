@@ -3,6 +3,8 @@
 #include <sstream>
 
 #include "conkey/lexer/lexer.hpp"
+#include "conkey/parser/parser.hpp"
+#include "conkey/parser/ast/program.hpp"
 
 const std::string PROMPT = ">>";
 
@@ -13,9 +15,11 @@ int main() {
     while(std::getline(std::cin, line)) {
         std::istringstream input(line);
         Conkey::Lexer::Lexer lexer(input, "cin");
-        while (!lexer.noMoreTokens()) {
-            std::cout << lexer.tryNextToken() << std::endl;
-        }
-        std::cout << PROMPT;
+        Conkey::Parser::Parser parser(lexer);
+
+        std::stringstream ss;
+        Conkey::Parser::ProgramPtr programPtr = parser.parseProgram();
+        programPtr->toString(ss, 0);
+        std::cout << ss.str() << "\n"  <<PROMPT;
     }
 }
