@@ -6,7 +6,7 @@
 namespace Conkey::Parser {
 
     void Program::toString(std::stringstream& ss, int depth) {
-        ss << std::string(depth * 2, ' ') << "Program";
+        ss << std::string(depth * 2, ' ') << "Program\n";
         for (const auto& stmntPtr : statements_) {
             stmntPtr->toString(ss, depth + 1);
             ss << "\n";

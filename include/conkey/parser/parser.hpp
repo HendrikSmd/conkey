@@ -38,6 +38,7 @@ namespace Conkey::Parser {
         ReturnStatementPtr          parseReturnStatement();
         ExpressionStatementPtr      parseExpressionStatement();
         ExpressionPtr               parseExpression(OperatorPrecedences prec);
+        ExpressionPtr               parsePrefixExpression();
 
 
         private:
