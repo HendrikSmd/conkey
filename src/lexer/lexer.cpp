@@ -18,7 +18,8 @@ namespace Conkey::Lexer {
         }
     }
 
-    bool Lexer::noMoreTokens() const {
+    bool Lexer::noMoreTokens() {
+        eatWhitespaces();
         return this->currentChar_ == EOF;
     }
 

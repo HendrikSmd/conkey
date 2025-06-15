@@ -45,9 +45,6 @@ TEST(LexerTest, MinimalTokenTestA) {
     while (!lexer.noMoreTokens()) {
         receivedTokens.push_back(lexer.tryNextToken());
     }
-    if (receivedTokens.back().type == Conkey::Lexer::TokenType::END_OF_FILE) {
-        receivedTokens.resize(receivedTokens.size() - 1);
-    }
 
     ASSERT_THAT(receivedTokens, expectedTokens);
 }
@@ -87,9 +84,6 @@ TEST(LexerTest, MinimalTokenTestB) {
 
     while (!lexer.noMoreTokens()) {
         receivedTokens.push_back(lexer.tryNextToken());
-    }
-    if (receivedTokens.back().type == Conkey::Lexer::TokenType::END_OF_FILE) {
-        receivedTokens.resize(receivedTokens.size() - 1);
     }
 
     ASSERT_THAT(receivedTokens, expectedTokens);
@@ -133,9 +127,6 @@ TEST(LexerTest, MinimalTokenTestC) {
     while (!lexer.noMoreTokens()) {
         receivedTokens.push_back(lexer.tryNextToken());
     }
-    if (receivedTokens.back().type == Conkey::Lexer::TokenType::END_OF_FILE) {
-        receivedTokens.resize(receivedTokens.size() - 1);
-    }
 
     ASSERT_THAT(receivedTokens, expectedTokens);
 }
@@ -175,9 +166,6 @@ TEST(LexerTest, BasicDeclarationAndArithmetic) {
 
     while (!lexer.noMoreTokens()) {
         receivedTokens.push_back(lexer.tryNextToken());
-    }
-    if (receivedTokens.back().type == Conkey::Lexer::TokenType::END_OF_FILE) {
-        receivedTokens.resize(receivedTokens.size() - 1);
     }
 
     ASSERT_THAT(receivedTokens, expectedTokens);
@@ -230,9 +218,6 @@ TEST(LexerTest, FunctionDefinitionAndControlFlow) {
     while (!lexer.noMoreTokens()) {
         receivedTokens.push_back(lexer.tryNextToken());
     }
-    if (receivedTokens.back().type == Conkey::Lexer::TokenType::END_OF_FILE) {
-        receivedTokens.resize(receivedTokens.size() - 1);
-    }
 
     ASSERT_THAT(receivedTokens, expectedTokens);
 }
@@ -278,9 +263,6 @@ TEST(LexerTest, BooleanExpressionsAndComparisons) {
 
     while (!lexer.noMoreTokens()) {
         receivedTokens.push_back(lexer.tryNextToken());
-    }
-    if (receivedTokens.back().type == Conkey::Lexer::TokenType::END_OF_FILE) {
-        receivedTokens.resize(receivedTokens.size() - 1);
     }
 
     ASSERT_THAT(receivedTokens, expectedTokens);
@@ -345,9 +327,6 @@ TEST(LexerTest, MixedOperationsAndFunctionCalls) {
     while (!lexer.noMoreTokens()) {
         receivedTokens.push_back(lexer.tryNextToken());
     }
-    if (receivedTokens.back().type == Conkey::Lexer::TokenType::END_OF_FILE) {
-        receivedTokens.resize(receivedTokens.size() - 1);
-    }
 
     ASSERT_THAT(receivedTokens, expectedTokens);
 }
@@ -401,9 +380,6 @@ TEST(LexerTest, InvalidProgramTestB) {
 
     while (!lexer.noMoreTokens()) {
         receivedTokens.push_back(lexer.tryNextToken());
-    }
-    if (receivedTokens.back().type == Conkey::Lexer::TokenType::END_OF_FILE) {
-        receivedTokens.resize(receivedTokens.size() - 1);
     }
 
     ASSERT_THAT(receivedTokens, expectedTokens);
@@ -498,9 +474,6 @@ TEST(LexerTest, RandomFormattingTest) {
     Conkey::Lexer::Lexer lexer(input, "random_format_program");
     while (!lexer.noMoreTokens()) {
         receivedTokens.push_back(lexer.tryNextToken());
-    }
-    if (receivedTokens.back().type == Conkey::Lexer::TokenType::END_OF_FILE) {
-        receivedTokens.resize(receivedTokens.size() - 1);
     }
 
     ASSERT_THAT(receivedTokens, expectedTokens);

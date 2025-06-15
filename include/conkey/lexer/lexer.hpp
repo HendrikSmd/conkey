@@ -13,7 +13,7 @@ namespace Conkey::Lexer {
         Lexer(std::istream& sourceIn, const std::string_view sourceName);
 
         Token                   tryNextToken();
-        bool                    noMoreTokens() const;
+        bool                    noMoreTokens();
 
         private:
 
