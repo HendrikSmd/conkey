@@ -3,7 +3,7 @@
 namespace Conkey::Parser {
 
     void ExpressionStatement::toString(std::stringstream& ss, int depth) {
-        ss << std::string(depth * 2, ' ') << "Expression\n";
+        ss << std::string(depth * 2, ' ') << "Expression Statement\n";
         value_->toString(ss, depth + 1);
     }
 
