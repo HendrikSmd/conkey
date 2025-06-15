@@ -11,10 +11,12 @@
 #include "conkey/parser/ast/ast_base.hpp"
 #include "conkey/parser/ast/expressions/boolean_literal.hpp"
 #include "conkey/parser/ast/expressions/identifier_expression.hpp"
+#include "conkey/parser/ast/expressions/if_expression.hpp"
 #include "conkey/parser/ast/expressions/infix_expression.hpp"
 #include "conkey/parser/ast/expressions/integer_literal.hpp"
 #include "conkey/parser/ast/expressions/prefix_expression.hpp"
 #include "conkey/parser/ast/program.hpp"
+#include "conkey/parser/ast/statements/block_statement.hpp"
 #include "conkey/parser/ast/statements/expression_statement.hpp"
 #include "conkey/parser/ast/statements/let_statement.hpp"
 #include "conkey/parser/ast/statements/return_statement.hpp"
@@ -41,8 +43,9 @@ namespace Conkey::Parser {
             {Lexer::TokenType::BANG, [this](){ return parsePrefixExpression(); }},      // !
             {Lexer::TokenType::MINUS, [this](){ return parsePrefixExpression(); }},     // -
             {Lexer::TokenType::TRUE, [this](){ return parseBooleanLiteral(); }},        // true
-            {Lexer::TokenType::FALSE, [this](){ return parseBooleanLiteral(); }},        // false
-            {Lexer::TokenType::LPAREN, [this](){ return parseGroupedExpression(); }}        // (
+            {Lexer::TokenType::FALSE, [this](){ return parseBooleanLiteral(); }},       // false
+            {Lexer::TokenType::LPAREN, [this](){ return parseGroupedExpression(); }},   // (
+            {Lexer::TokenType::IF, [this](){ return parseIfExpression(); }}             // if ...
         }),
         infixParseFns_({
             {Lexer::TokenType::PLUS, [this](ExpressionPtr exp){ return parseInfixExpression(std::move(exp)); }},
@@ -246,11 +249,71 @@ namespace Conkey::Parser {
     }
 
 
+    ExpressionPtr Parser::parseIfExpression() {
+        IfExpressionPtr ifExprPtr = std::make_unique<IfExpression>();
+        ifExprPtr->alternative_ = nullptr;
+
+        // currentToken_ is expected to be over 'if'
+        expectCurrentTokenType(Lexer::TokenType::IF);
+        expectPeekTokenType(Lexer::TokenType::LPAREN);
+
+        nextToken();
+        nextToken();
+
+        // currentToken_ now holds the first token of the condition expression
+        ifExprPtr->condition_ = parseExpression(OperatorPrecedence::LOWEST);
+        // currentToken_ now holds the last token of the condition expression
+
+        expectPeekTokenType(Lexer::TokenType::RPAREN);
+        nextToken();
+        // currentToken_ now holds ')'
+        nextToken();
+        // currentToken_ should now hold '{'
+
+        ifExprPtr->consequence_ = parseBlockStatement();
+
+        if (peekToken_.type != Lexer::TokenType::ELSE) {
+            // Parsed if expression without else branch
+            return ifExprPtr;
+        }
+
+        nextToken();
+        // There is an else branch and currentToken_ holds 'else'
+        nextToken();
+        // currentToken_ should now hold '{'
+
+        ifExprPtr->alternative_ = parseBlockStatement();
+
+        return ifExprPtr;
+    }
+
+
+    BlockStatementPtr Parser::parseBlockStatement() {
+        BlockStatementPtr blockStmntPtr = std::make_unique<BlockStatement>();
+
+        expectCurrentTokenType(Lexer::TokenType::LBRACE);
+        nextToken();
+        // currentToken should now be on the first
+        // token of the first statement in the block
+
+        while (
+            currentToken_.type != Lexer::TokenType::RBRACE &&
+            currentToken_.type != Lexer::TokenType::END_OF_FILE) {
+                blockStmntPtr->statements_.emplace_back(parseStatement());
+                nextToken();
+        }
+        expectCurrentTokenType(Lexer::TokenType::RBRACE);
+
+        return blockStmntPtr;
+    }
+
+
     ExpressionPtr Parser::parseIdentifier() {
         expectCurrentTokenType(Lexer::TokenType::IDENT);
         IdentifierPtr identPtr = std::make_unique<Identifier>(std::move(currentToken_.literal));
         return identPtr;
     }
+
 
     ExpressionPtr Parser::parseIntegerLiteral() {
         expectCurrentTokenType(Lexer::TokenType::INT);
