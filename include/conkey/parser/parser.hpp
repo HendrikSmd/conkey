@@ -14,7 +14,7 @@
 
 namespace Conkey::Parser {
 
-    enum class OperatorPrecedences : unsigned char {
+    enum class OperatorPrecedence : unsigned char {
         LOWEST = 1,
         EQUALS,
         LESSGREATER,
@@ -23,6 +23,21 @@ namespace Conkey::Parser {
         PREFIX,
         CALL
     };
+
+    const std::map<Lexer::TokenType, OperatorPrecedence> precedences = {
+        {Lexer::TokenType::EQ,          OperatorPrecedence::EQUALS},
+        {Lexer::TokenType::NOT_EQ,      OperatorPrecedence::EQUALS},
+        {Lexer::TokenType::LT,          OperatorPrecedence::LESSGREATER},
+        {Lexer::TokenType::GT,          OperatorPrecedence::LESSGREATER},
+        {Lexer::TokenType::PLUS,        OperatorPrecedence::SUM},
+        {Lexer::TokenType::MINUS,       OperatorPrecedence::SUM},
+        {Lexer::TokenType::SLASH,       OperatorPrecedence::PRODUCT},
+        {Lexer::TokenType::ASTERISK,    OperatorPrecedence::PRODUCT}
+    };
+
+
+    OperatorPrecedence getOperatorPrecedence(Lexer::TokenType type);
+
 
     class Parser {
 
@@ -37,21 +52,32 @@ namespace Conkey::Parser {
         LetStatementPtr             parseLetStatement();
         ReturnStatementPtr          parseReturnStatement();
         ExpressionStatementPtr      parseExpressionStatement();
-        ExpressionPtr               parseExpression(OperatorPrecedences prec);
+
+        // Pratt Expression Parsing
+        ExpressionPtr               parseExpression(OperatorPrecedence prec);
         ExpressionPtr               parsePrefixExpression();
+        ExpressionPtr               parseGroupedExpression();
+        ExpressionPtr               parseInfixExpression(ExpressionPtr left);
 
 
         private:
-        void                        nextToken();
-        void                        expectTokenType(Lexer::TokenType tokenType);
+        inline void                 nextToken();
+        inline void                 expectCurrentTokenType(Lexer::TokenType tokenType);
+        inline void                 expectPeekTokenType(Lexer::TokenType tokenType);
+
+        inline void                 expectedPrefixOperatorButGot(Lexer::TokenType tokenType);
 
         ExpressionPtr               parseIdentifier();
         ExpressionPtr               parseIntegerLiteral();
+        ExpressionPtr               parseBooleanLiteral();
 
 
         std::map<Lexer::TokenType, PrefixExprParseFN> prefixParseFns_;
         std::map<Lexer::TokenType, InfixExprParseFN> infixParseFns_;
+
         Lexer::Token currentToken_;
+        Lexer::Token peekToken_;
+
         Lexer::Lexer& lexer_;
     };
 
