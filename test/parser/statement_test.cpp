@@ -99,3 +99,59 @@ TEST(ParserTest, IfStatementTest) {
 
     EXPECT_THAT(received, testing::ContainerEq(EXPECTED_IF_STATEMENT_ASTS));
 }
+
+
+const std::vector<std::string> EXPECTED_FUNCTION_LITERAL_ASTS = {
+R"(Program
+  Expression Statement
+    FunctionLiteral:
+      Parameters: []
+      BlockStatement:
+        Return
+          InfixExpression: (Operator='+')
+            Integer: 3
+            Integer: 4
+)",
+R"(Program
+  Expression Statement
+    FunctionLiteral:
+      Parameters: [Identifier: x]
+      BlockStatement:
+        Return
+          PrefixExpression: (Operator='!')
+            Identifier: x
+)",
+R"(Program
+  Expression Statement
+    FunctionLiteral:
+      Parameters: [Identifier: x, Identifier: foo, Identifier: bar]
+      BlockStatement:
+        Return
+          InfixExpression: (Operator='+')
+            InfixExpression: (Operator='+')
+              Identifier: x
+              Identifier: foo
+            Identifier: bar
+)"
+};
+
+TEST(ParserTest, FunctionliteralTest) {
+    const std::vector<std::string> testExpressions = {
+        "fn(){ return 3 + 4; };",
+        "fn(x){ return !x; };",
+        "fn(x, foo, bar){ return x + foo + bar; };"
+    };
+    std::vector<std::string> received;
+    for (const auto& testExpr : testExpressions) {
+        std::istringstream input(testExpr);
+        Lexer lexer(input, "baz");
+        Parser parser(lexer);
+
+        ProgramPtr pPtr = parser.parseProgram();
+        std::stringstream ss;
+        pPtr->toString(ss);
+        received.push_back(ss.str());
+    };
+
+    EXPECT_THAT(received, testing::ContainerEq(EXPECTED_FUNCTION_LITERAL_ASTS));
+}

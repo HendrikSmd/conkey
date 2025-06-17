@@ -10,6 +10,7 @@
 #include "conkey/lexer/token.hpp"
 #include "conkey/parser/ast/ast_base.hpp"
 #include "conkey/parser/ast/expressions/boolean_literal.hpp"
+#include "conkey/parser/ast/expressions/function_literal.hpp"
 #include "conkey/parser/ast/expressions/identifier_expression.hpp"
 #include "conkey/parser/ast/expressions/if_expression.hpp"
 #include "conkey/parser/ast/expressions/infix_expression.hpp"
@@ -45,7 +46,8 @@ namespace Conkey::Parser {
             {Lexer::TokenType::TRUE, [this](){ return parseBooleanLiteral(); }},        // true
             {Lexer::TokenType::FALSE, [this](){ return parseBooleanLiteral(); }},       // false
             {Lexer::TokenType::LPAREN, [this](){ return parseGroupedExpression(); }},   // (
-            {Lexer::TokenType::IF, [this](){ return parseIfExpression(); }}             // if ...
+            {Lexer::TokenType::IF, [this](){ return parseIfExpression(); }},            // if ...
+            {Lexer::TokenType::FUNCTION, [this](){ return parseFunctionLiteral(); }}    // fn (...) ...
         }),
         infixParseFns_({
             {Lexer::TokenType::PLUS, [this](ExpressionPtr exp){ return parseInfixExpression(std::move(exp)); }},
@@ -305,6 +307,35 @@ namespace Conkey::Parser {
         expectCurrentTokenType(Lexer::TokenType::RBRACE);
 
         return blockStmntPtr;
+    }
+
+
+    FunctionLiteralPtr Parser::parseFunctionLiteral() {
+        FunctionLiteralPtr fnLitPtr = std::make_unique<FunctionLiteral>();
+        expectCurrentTokenType(Lexer::TokenType::FUNCTION);
+        nextToken();
+        expectCurrentTokenType(Lexer::TokenType::LPAREN);
+        nextToken();
+        // currentToken_ should now be on the first parameter or
+        // on ')' if there is no parameter
+
+        while (currentToken_.type != Lexer::TokenType::RPAREN) {
+            Identifier* rawIdentPtr = static_cast<Identifier*>(parseIdentifier().release());
+            fnLitPtr->parameters_.emplace_back(rawIdentPtr);
+            if (peekToken_.type != Lexer::TokenType::RPAREN) {
+                expectPeekTokenType(Lexer::TokenType::COMMA);
+                nextToken();
+                // currentToken_ now holds the comma
+            }
+            nextToken();
+        }
+
+        expectPeekTokenType(Lexer::TokenType::LBRACE);
+        nextToken();
+
+        fnLitPtr->body_ = parseBlockStatement();
+
+        return fnLitPtr;
     }
 
 

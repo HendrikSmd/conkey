@@ -3,6 +3,7 @@
 
 #include "conkey/lexer/lexer.hpp"
 #include "conkey/lexer/token.hpp"
+#include "conkey/parser/ast/expressions/function_literal.hpp"
 #include "conkey/parser/ast/program.hpp"
 #include "conkey/parser/ast/ast_base.hpp"
 #include "conkey/parser/ast/statements/block_statement.hpp"
@@ -61,6 +62,7 @@ namespace Conkey::Parser {
         ExpressionPtr               parseInfixExpression(ExpressionPtr left);
         ExpressionPtr               parseIfExpression();
         BlockStatementPtr           parseBlockStatement();
+        FunctionLiteralPtr          parseFunctionLiteral();
 
 
         private:
