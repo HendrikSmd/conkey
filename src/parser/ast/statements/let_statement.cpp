@@ -7,7 +7,6 @@ namespace Conkey::Parser {
         identifier_->toString(ss, depth + 1);
         ss << "\n";
         value_->toString(ss, depth + 1);
-        ss << "\n";
     }
 
 
