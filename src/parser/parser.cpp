@@ -10,6 +10,7 @@
 #include "conkey/lexer/token.hpp"
 #include "conkey/parser/ast/ast_base.hpp"
 #include "conkey/parser/ast/expressions/boolean_literal.hpp"
+#include "conkey/parser/ast/expressions/call_expression.hpp"
 #include "conkey/parser/ast/expressions/function_literal.hpp"
 #include "conkey/parser/ast/expressions/identifier_expression.hpp"
 #include "conkey/parser/ast/expressions/if_expression.hpp"
@@ -58,6 +59,7 @@ namespace Conkey::Parser {
             {Lexer::TokenType::NOT_EQ, [this](ExpressionPtr exp){ return parseInfixExpression(std::move(exp)); }},
             {Lexer::TokenType::LT, [this](ExpressionPtr exp){ return parseInfixExpression(std::move(exp)); }},
             {Lexer::TokenType::GT, [this](ExpressionPtr exp){ return parseInfixExpression(std::move(exp)); }},
+            {Lexer::TokenType::LPAREN, [this](ExpressionPtr exp){ return parseCallExpression(std::move(exp)); }},
         })
     {
             // Call nextToken() two times, so currentToken_ and peekToken_ are both set
@@ -336,6 +338,25 @@ namespace Conkey::Parser {
         fnLitPtr->body_ = parseBlockStatement();
 
         return fnLitPtr;
+    }
+
+
+    ExpressionPtr Parser::parseCallExpression(ExpressionPtr function) {
+        CallExpressionPtr callExpressionPtr = std::make_unique<CallExpression>();
+        callExpressionPtr->function_ = std::move(function);
+        expectCurrentTokenType(Lexer::TokenType::LPAREN);
+        nextToken();
+
+        while (currentToken_.type != Lexer::TokenType::RPAREN) {
+            callExpressionPtr->arguments_.push_back(parseExpression(OperatorPrecedence::LOWEST));
+            if (peekToken_.type != Lexer::TokenType::RPAREN) {
+                expectPeekTokenType(Lexer::TokenType::COMMA);
+                nextToken();
+            }
+            nextToken();
+        }
+
+        return callExpressionPtr;
     }
 
 

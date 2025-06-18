@@ -46,7 +46,6 @@ TEST(ParserTest, LetStatementTest) {
         ProgramPtr pPtr = parser.parseProgram();
         std::stringstream ss;
         pPtr->toString(ss);
-        std::cout << ss.str() << std::endl;
         received.push_back(ss.str());
     };
 
@@ -154,4 +153,103 @@ TEST(ParserTest, FunctionliteralTest) {
     };
 
     EXPECT_THAT(received, testing::ContainerEq(EXPECTED_FUNCTION_LITERAL_ASTS));
+}
+
+
+const std::vector<std::string> EXPECTED_CALL_EXPRESSION_ASTS = {
+R"(Program
+  Expression Statement
+    CallExpression:
+      CalledFunction:
+        FunctionLiteral:
+          Parameters: []
+          BlockStatement:
+            Return
+              InfixExpression: (Operator='+')
+                Integer: 3
+                Integer: 4
+)",
+R"(Program
+  Expression Statement
+    CallExpression:
+      CalledFunction:
+        FunctionLiteral:
+          Parameters: [Identifier: x]
+          BlockStatement:
+            Return
+              PrefixExpression: (Operator='!')
+                Identifier: x
+      Argument 0:
+        Boolean: True
+)",
+R"(Program
+  Expression Statement
+    CallExpression:
+      CalledFunction:
+        FunctionLiteral:
+          Parameters: [Identifier: foo, Identifier: bar]
+          BlockStatement:
+            Return
+              InfixExpression: (Operator='+')
+                Identifier: foo
+                Identifier: bar
+      Argument 0:
+        Integer: 10
+      Argument 1:
+        Integer: 20
+)",
+R"(Program
+  Expression Statement
+    InfixExpression: (Operator='+')
+      CallExpression:
+        CalledFunction:
+          Identifier: bar
+      CallExpression:
+        CalledFunction:
+          Identifier: foo
+        Argument 0:
+          Integer: 10
+)",
+R"(Program
+  Expression Statement
+    InfixExpression: (Operator='*')
+      Integer: 5
+      CallExpression:
+        CalledFunction:
+          Identifier: call
+        Argument 0:
+          Integer: 10
+        Argument 1:
+          InfixExpression: (Operator='+')
+            Integer: 20
+            Integer: 15
+        Argument 2:
+          CallExpression:
+            CalledFunction:
+              Identifier: bar
+)"
+};
+
+
+TEST(ParserTest, CallExpressionTest) {
+    const std::vector<std::string> testExpressions = {
+        "fn(){ return 3 + 4; }();",
+        "fn(x){ return !x; }(true);",
+        "fn(foo, bar){ return foo + bar; }(10,20);",
+        "bar() + foo(10);",
+        "5 * call(10, 20 + 15, bar());"
+    };
+    std::vector<std::string> received;
+    for (const auto& testExpr : testExpressions) {
+        std::istringstream input(testExpr);
+        Lexer lexer(input, "baz");
+        Parser parser(lexer);
+
+        ProgramPtr pPtr = parser.parseProgram();
+        std::stringstream ss;
+        pPtr->toString(ss);
+        received.push_back(ss.str());
+    };
+
+    EXPECT_THAT(received, testing::ContainerEq(EXPECTED_CALL_EXPRESSION_ASTS));
 }

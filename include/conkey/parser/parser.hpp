@@ -3,6 +3,7 @@
 
 #include "conkey/lexer/lexer.hpp"
 #include "conkey/lexer/token.hpp"
+#include "conkey/parser/ast/expressions/call_expression.hpp"
 #include "conkey/parser/ast/expressions/function_literal.hpp"
 #include "conkey/parser/ast/program.hpp"
 #include "conkey/parser/ast/ast_base.hpp"
@@ -34,7 +35,8 @@ namespace Conkey::Parser {
         {Lexer::TokenType::PLUS,        OperatorPrecedence::SUM},
         {Lexer::TokenType::MINUS,       OperatorPrecedence::SUM},
         {Lexer::TokenType::SLASH,       OperatorPrecedence::PRODUCT},
-        {Lexer::TokenType::ASTERISK,    OperatorPrecedence::PRODUCT}
+        {Lexer::TokenType::ASTERISK,    OperatorPrecedence::PRODUCT},
+        {Lexer::TokenType::LPAREN,      OperatorPrecedence::CALL}
     };
 
 
@@ -63,6 +65,7 @@ namespace Conkey::Parser {
         ExpressionPtr               parseIfExpression();
         BlockStatementPtr           parseBlockStatement();
         FunctionLiteralPtr          parseFunctionLiteral();
+        ExpressionPtr               parseCallExpression(ExpressionPtr function);
 
 
         private:
