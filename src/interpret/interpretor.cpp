@@ -13,6 +13,7 @@
 #include "conkey/parser/ast/statements/expression_statement.hpp"
 #include "conkey/parser/ast/statements/let_statement.hpp"
 #include "conkey/parser/ast/statements/return_statement.hpp"
+#include <cstdint>
 #include <memory>
 
 
@@ -55,7 +56,15 @@ namespace Conkey::Interpret {
     }
 
     ValuePtr Interpretor::visitPrefixExpression(Parser::PrefixExpression& expRef) {
-        return this->NULL_VALUE_PTR;
+        auto rightValue = expRef.right_->accept(*this);
+        switch (expRef.operator_) {
+            case Parser::PrefixOperator::BANG:
+                return this->applyBangPrefixOperator(rightValue);
+            case Parser::PrefixOperator::MINUS:
+                return this->applyMinusPrefixOperator(rightValue);
+        }
+
+        return NULL_VALUE_PTR;
     }
 
     ValuePtr Interpretor::visitBlockStatement(Parser::BlockStatement& stmntRef) {
@@ -72,6 +81,30 @@ namespace Conkey::Interpret {
 
     ValuePtr Interpretor::visitReturnStatement(Parser::ReturnStatement& stmntRef) {
         return this->NULL_VALUE_PTR;
+    }
+
+    ValuePtr Interpretor::applyBangPrefixOperator(const ValuePtr& vPtr) const {
+        switch(vPtr->valueType()) {
+            case ValueType::BOOLEAN_VALUE:
+                return static_cast<BooleanValue*>(vPtr.get())->value_ ? FALSE_VALUE_PTR : TRUE_VALUE_PTR;
+            case ValueType::INTEGER_VALUE:
+                return FALSE_VALUE_PTR;
+            case ValueType::NULL_VALUE:
+                return TRUE_VALUE_PTR;
+        }
+
+        return FALSE_VALUE_PTR;
+    }
+
+    ValuePtr Interpretor::applyMinusPrefixOperator(const ValuePtr& vPtr) const {
+        std::int64_t value;
+        switch(vPtr->valueType()) {
+            case ValueType::INTEGER_VALUE:
+                value = static_cast<IntegerValue*>(vPtr.get())->value_;
+                return std::make_shared<IntegerValue>(-value);
+            default:
+                return NULL_VALUE_PTR;
+        }
     }
 
 }

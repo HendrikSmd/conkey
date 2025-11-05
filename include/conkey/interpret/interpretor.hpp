@@ -33,6 +33,9 @@ namespace Conkey::Interpret {
         const std::shared_ptr<BooleanValue>     TRUE_VALUE_PTR = std::make_shared<BooleanValue>(true);
         const std::shared_ptr<BooleanValue>     FALSE_VALUE_PTR = std::make_shared<BooleanValue>(false);
         const std::shared_ptr<NullValue>        NULL_VALUE_PTR = std::make_shared<NullValue>();
+
+        ValuePtr applyBangPrefixOperator(const ValuePtr& vPtr) const;
+        ValuePtr applyMinusPrefixOperator(const ValuePtr& vPtr) const;
     };
 
 
