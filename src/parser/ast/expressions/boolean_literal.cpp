@@ -9,4 +9,8 @@ namespace Conkey::Parser {
         ss << std::string(depth * 2, ' ') << "Boolean: " << (value_ ? "True" : "False");
     }
 
+    Interpret::ValuePtr BooleanLiteral::accept(Interpret::Visitor<Interpret::ValuePtr>& visitor) {
+        return visitor.visitBooleanLiteral(*this);
+    }
+
 }

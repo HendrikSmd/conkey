@@ -13,4 +13,8 @@ namespace Conkey::Parser {
         }
     }
 
+    Interpret::ValuePtr Program::accept(Interpret::Visitor<Interpret::ValuePtr>& visitor) {
+        return visitor.visitProgram(*this);
+    }
+
 }

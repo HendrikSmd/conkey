@@ -7,5 +7,9 @@ namespace Conkey::Parser {
         right_->toString(ss, depth + 1);
     }
 
+    Interpret::ValuePtr PrefixExpression::accept(Interpret::Visitor<Interpret::ValuePtr>& visitor) {
+        return visitor.visitPrefixExpression(*this);
+    }
+
 
 }

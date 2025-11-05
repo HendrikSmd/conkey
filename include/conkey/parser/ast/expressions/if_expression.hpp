@@ -13,6 +13,9 @@ namespace Conkey::Parser {
 
         void toString(std::stringstream& ss, int depth = 0) override;
 
+        Interpret::ValuePtr accept(Interpret::Visitor<Interpret::ValuePtr>& visitor) override;
+
+
         ExpressionPtr condition_;
         BlockStatementPtr consequence_;
         BlockStatementPtr alternative_;

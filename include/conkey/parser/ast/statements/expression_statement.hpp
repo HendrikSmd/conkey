@@ -10,6 +10,8 @@ namespace Conkey::Parser {
         ~ExpressionStatement() override = default;
         void toString(std::stringstream& ss, int depth = 0) override;
 
+        Interpret::ValuePtr accept(Interpret::Visitor<Interpret::ValuePtr>& visitor) override;
+
         ExpressionPtr value_;
     };
 

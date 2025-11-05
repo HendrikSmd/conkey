@@ -7,5 +7,8 @@ namespace Conkey::Parser {
         value_->toString(ss, depth + 1);
     }
 
+    Interpret::ValuePtr ReturnStatement::accept(Interpret::Visitor<Interpret::ValuePtr>& visitor) {
+        return visitor.visitReturnStatement(*this);
+    }
 
 }

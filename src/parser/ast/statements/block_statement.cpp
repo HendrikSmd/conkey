@@ -13,4 +13,9 @@ namespace Conkey::Parser {
         }
     }
 
+    Interpret::ValuePtr BlockStatement::accept(Interpret::Visitor<Interpret::ValuePtr>& visitor) {
+        return visitor.visitBlockStatement(*this);
+    }
+
+
 }

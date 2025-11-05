@@ -11,6 +11,8 @@ namespace Conkey::Parser {
         ~LetStatement() override = default;
         void toString(std::stringstream& ss, int depth = 0) override;
 
+        Interpret::ValuePtr accept(Interpret::Visitor<Interpret::ValuePtr>& visitor) override;
+
         IdentifierPtr identifier_;
         ExpressionPtr value_;
     };

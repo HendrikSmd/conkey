@@ -18,6 +18,7 @@ file(GLOB_RECURSE
      Sources
      src/lexer/*.cpp
      src/parser/*.cpp
+     src/interpret/*.cpp
 )
 
 file(GLOB_RECURSE

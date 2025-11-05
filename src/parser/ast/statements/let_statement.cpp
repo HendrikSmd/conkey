@@ -9,5 +9,9 @@ namespace Conkey::Parser {
         value_->toString(ss, depth + 1);
     }
 
+    Interpret::ValuePtr LetStatement::accept(Interpret::Visitor<Interpret::ValuePtr>& visitor) {
+        return visitor.visitLetStatement(*this);
+    }
+
 
 }

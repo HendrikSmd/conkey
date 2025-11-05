@@ -16,5 +16,9 @@ namespace Conkey::Parser {
         body_->toString(ss, depth + 1);
     }
 
+    Interpret::ValuePtr FunctionLiteral::accept(Interpret::Visitor<Interpret::ValuePtr>& visitor) {
+        return visitor.visitFunctionLiteral(*this);
+    }
+
 
 }

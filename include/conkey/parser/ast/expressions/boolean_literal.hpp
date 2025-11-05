@@ -12,6 +12,8 @@ namespace Conkey::Parser {
 
         void toString(std::stringstream& ss, int depth = 0) override;
 
+        Interpret::ValuePtr accept(Conkey::Interpret::Visitor<Interpret::ValuePtr>& visitor) override;
+
         bool value_;
     };
 

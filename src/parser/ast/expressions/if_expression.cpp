@@ -13,5 +13,10 @@ namespace Conkey::Parser {
         }
     }
 
+    Interpret::ValuePtr IfExpression::accept(Interpret::Visitor<Interpret::ValuePtr>& visitor) {
+        return visitor.visitIfExpression(*this);
+    }
+
+
 
 }

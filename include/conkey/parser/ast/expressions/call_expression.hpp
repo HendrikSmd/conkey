@@ -13,6 +13,8 @@ namespace Conkey::Parser {
 
         void toString(std::stringstream& ss, int depth = 0) override;
 
+        Interpret::ValuePtr accept(Conkey::Interpret::Visitor<Interpret::ValuePtr>& visitor) override;
+
         ExpressionPtr function_;    // IdentifierPtr or FunctionLiteralPtr
         std::vector<ExpressionPtr> arguments_;
     };

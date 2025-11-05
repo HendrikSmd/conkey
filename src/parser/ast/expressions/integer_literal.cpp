@@ -9,4 +9,9 @@ namespace Conkey::Parser {
         ss << std::string(depth * 2, ' ') << "Integer: " << value_;
     }
 
+    Interpret::ValuePtr IntegerLiteral::accept(Interpret::Visitor<Interpret::ValuePtr>& visitor) {
+        return visitor.visitIntegerLiteral(*this);
+    }
+
+
 }

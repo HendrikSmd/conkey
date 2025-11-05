@@ -2,16 +2,20 @@
 #include <string>
 #include <sstream>
 
+#include "conkey/interpret/interpretor.hpp"
 #include "conkey/lexer/lexer.hpp"
 #include "conkey/parser/parser.hpp"
 
 using namespace Conkey::Lexer;
 using namespace Conkey::Parser;
+using namespace Conkey::Interpret;
+
 
 const std::string PROMPT = ">>";
 
 int main() {
     std::string line;
+    Interpretor interpretor;
 
     std::cout << PROMPT;
     while(std::getline(std::cin, line)) {
@@ -22,7 +26,8 @@ int main() {
         std::stringstream ss;
         try {
             ProgramPtr programPtr = parser.parseProgram();
-            programPtr->toString(ss, 0);
+            auto value = programPtr->accept(interpretor);
+            std::cout << value->inspect() << std::endl;
         } catch (const ParseError& exc) {
             std::cout << exc.what() << std::endl;
         }

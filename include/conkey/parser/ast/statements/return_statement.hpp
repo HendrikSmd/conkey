@@ -1,6 +1,8 @@
 #ifndef CONKEY_PARSER_RETURN_STATEMENT_HPP
 #define CONKEY_PARSER_RETURN_STATEMENT_HPP
 
+#include "conkey/interpret/values.hpp"
+#include "conkey/interpret/visitor.hpp"
 #include "conkey/parser/ast/ast_base.hpp"
 
 namespace Conkey::Parser {
@@ -9,6 +11,8 @@ namespace Conkey::Parser {
         public:
         ~ReturnStatement() override = default;
         void toString(std::stringstream& ss, int depth = 0) override;
+
+        Interpret::ValuePtr accept(Interpret::Visitor<Interpret::ValuePtr>& visitor) override;
 
         ExpressionPtr value_;
     };

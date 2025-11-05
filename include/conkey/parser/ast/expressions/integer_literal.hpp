@@ -12,6 +12,8 @@ namespace Conkey::Parser {
         IntegerLiteral(int64_t value);
         ~IntegerLiteral() override = default;
 
+        Interpret::ValuePtr accept(Interpret::Visitor<Interpret::ValuePtr>& visitor) override;
+
         void toString(std::stringstream& ss, int depth = 0) override;
 
         int64_t value_;

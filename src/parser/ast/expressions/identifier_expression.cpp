@@ -9,4 +9,9 @@ namespace Conkey::Parser {
         ss << std::string(depth * 2, ' ') << "Identifier: " << value_;
     }
 
+    Interpret::ValuePtr Identifier::accept(Interpret::Visitor<Interpret::ValuePtr>& visitor) {
+        return visitor.visitIdentifierExpression(*this);
+    }
+
+
 }
