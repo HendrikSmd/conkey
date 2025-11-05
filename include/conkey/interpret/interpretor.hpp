@@ -3,6 +3,7 @@
 
 #include "conkey/interpret/values.hpp"
 #include "conkey/interpret/visitor.hpp"
+#include <memory>
 
 namespace Conkey::Interpret {
 
@@ -28,6 +29,10 @@ namespace Conkey::Interpret {
         virtual ValuePtr visitLetStatement(Parser::LetStatement& stmntRef) override;
         virtual ValuePtr visitReturnStatement(Parser::ReturnStatement& stmntRef) override;
 
+        private:
+        const std::shared_ptr<BooleanValue>     TRUE_VALUE_PTR = std::make_shared<BooleanValue>(true);
+        const std::shared_ptr<BooleanValue>     FALSE_VALUE_PTR = std::make_shared<BooleanValue>(false);
+        const std::shared_ptr<NullValue>        NULL_VALUE_PTR = std::make_shared<NullValue>();
     };
 
 

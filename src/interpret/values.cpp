@@ -1,8 +1,12 @@
 #include "conkey/interpret/values.hpp"
+#include <cstdint>
 #include <string>
 
 
 namespace Conkey::Interpret {
+
+    IntegerValue::IntegerValue(std::int64_t value) :
+        value_(value) {};
 
     ValueType IntegerValue::valueType() {
         return ValueType::INTEGER_VALUE;
@@ -11,6 +15,9 @@ namespace Conkey::Interpret {
     std::string IntegerValue::inspect() {
         return std::to_string(this->value_);
     }
+
+    BooleanValue::BooleanValue(bool value) :
+        value_(value) {};
 
     ValueType BooleanValue::valueType() {
         return ValueType::BOOLEAN_VALUE;

@@ -21,6 +21,8 @@ namespace Conkey::Interpret {
     using ValuePtr = std::shared_ptr<Conkey::Interpret::Value>;
 
     struct IntegerValue : public Value {
+        IntegerValue(std::int64_t value);
+
         ValueType valueType() override;
         std::string inspect() override;
 
@@ -28,6 +30,8 @@ namespace Conkey::Interpret {
     };
 
     struct BooleanValue : public Value {
+        BooleanValue(bool value);
+
         ValueType valueType() override;
         std::string inspect() override;
 
