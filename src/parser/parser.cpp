@@ -214,7 +214,17 @@ namespace Conkey::Parser {
     ExpressionPtr Parser::parsePrefixExpression() {
         PrefixExpressionPtr prefixExprPtr = std::make_unique<PrefixExpression>();
 
-        prefixExprPtr->operatorLiteral_ = currentToken_.literal;
+
+        switch(currentToken_.type) {
+            case Lexer::TokenType::BANG:
+                prefixExprPtr->operator_ = PrefixOperator::BANG;
+                break;
+            case Lexer::TokenType::MINUS:
+                prefixExprPtr->operator_ = PrefixOperator::MINUS;
+                break;
+            default:
+                throw new ParseError("Tried to parse a prefix expression with the unrecognized prefix operator" + currentToken_.literal);
+        }
         nextToken();
 
         prefixExprPtr->right_ = parseExpression(OperatorPrecedence::PREFIX);

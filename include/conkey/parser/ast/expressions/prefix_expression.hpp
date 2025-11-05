@@ -3,8 +3,16 @@
 
 #include "conkey/parser/ast/ast_base.hpp"
 #include <memory>
+#include <string>
 
 namespace Conkey::Parser {
+
+    enum class PrefixOperator {
+        BANG,
+        MINUS
+    };
+
+    std::string to_string(const PrefixOperator& op);
 
     class PrefixExpression : public Expression {
         public:
@@ -14,7 +22,7 @@ namespace Conkey::Parser {
 
         Interpret::ValuePtr accept(Interpret::Visitor<Interpret::ValuePtr>& visitor) override;
 
-        std::string operatorLiteral_;
+        PrefixOperator operator_;
         ExpressionPtr right_;
     };
 
