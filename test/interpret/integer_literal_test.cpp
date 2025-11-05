@@ -11,21 +11,50 @@ using namespace Conkey::Lexer;
 using namespace Conkey::Parser;
 using namespace Conkey::Interpret;
 
-TEST(InterpretorTest, IntegerLiteralTest) {
-    const std::vector<std::string> testExpressions = {
-        "1;",
-        "10;",
-        "-20;"
-    };
-    std::vector<ValuePtr> received;
+TEST(InterpretorTest, IntegerLiteralTest1) {
+    std::string testExpression = "0;";
     Interpretor interpretor;
 
-    for (const auto& testExpr : testExpressions) {
-        std::istringstream input(testExpr);
-        Lexer lexer(input, "baz");
-        Parser parser(lexer);
+    std::istringstream input(testExpression);
+    Lexer lexer(input, "baz");
+    Parser parser(lexer);
+    ExpressionStatementPtr ePtr = parser.parseExpressionStatement();
+    ValuePtr returnValue = ePtr->accept(interpretor);
 
-        ExpressionStatementPtr ePtr = parser.parseExpressionStatement();
-        received.push_back(ePtr->accept(interpretor));
-    };
+    EXPECT_EQ(returnValue->valueType(), ValueType::INTEGER_VALUE);
+    auto castResult = dynamic_cast<IntegerValue*>(returnValue.get());
+    EXPECT_TRUE(castResult);
+    EXPECT_EQ(castResult->value_, 0);
+}
+
+TEST(InterpretorTest, IntegerLiteralTest2) {
+    std::string testExpression = "42;";
+    Interpretor interpretor;
+
+    std::istringstream input(testExpression);
+    Lexer lexer(input, "baz");
+    Parser parser(lexer);
+    ExpressionStatementPtr ePtr = parser.parseExpressionStatement();
+    ValuePtr returnValue = ePtr->accept(interpretor);
+
+    EXPECT_EQ(returnValue->valueType(), ValueType::INTEGER_VALUE);
+    auto castResult = dynamic_cast<IntegerValue*>(returnValue.get());
+    EXPECT_TRUE(castResult);
+    EXPECT_EQ(castResult->value_, 42);
+}
+
+TEST(InterpretorTest, IntegerLiteralTest3) {
+    std::string testExpression = "9223372036854775807;";
+    Interpretor interpretor;
+
+    std::istringstream input(testExpression);
+    Lexer lexer(input, "baz");
+    Parser parser(lexer);
+    ExpressionStatementPtr ePtr = parser.parseExpressionStatement();
+    ValuePtr returnValue = ePtr->accept(interpretor);
+
+    EXPECT_EQ(returnValue->valueType(), ValueType::INTEGER_VALUE);
+    auto castResult = dynamic_cast<IntegerValue*>(returnValue.get());
+    EXPECT_TRUE(castResult);
+    EXPECT_EQ(castResult->value_, 9223372036854775807);
 }
