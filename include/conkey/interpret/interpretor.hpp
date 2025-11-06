@@ -1,10 +1,12 @@
 #ifndef CONKEY_INTERPRET_INTERPRETOR_HPP
 #define CONKEY_INTERPRET_INTERPRETOR_HPP
 
+#include <memory>
+#include <vector>
+
 #include "conkey/interpret/values.hpp"
 #include "conkey/interpret/visitor.hpp"
 #include "conkey/parser/ast/expressions/infix_expression.hpp"
-#include <memory>
 
 namespace Conkey::Interpret {
 
@@ -34,6 +36,10 @@ namespace Conkey::Interpret {
         const std::shared_ptr<BooleanValue>     TRUE_VALUE_PTR = std::make_shared<BooleanValue>(true);
         const std::shared_ptr<BooleanValue>     FALSE_VALUE_PTR = std::make_shared<BooleanValue>(false);
         const std::shared_ptr<NullValue>        NULL_VALUE_PTR = std::make_shared<NullValue>();
+
+        bool isTruthy(const ValuePtr& valuePtr) const;
+
+        ValuePtr evaluateStatements(const std::vector<Parser::StatementPtr>& stmnts);
 
         ValuePtr applyBangPrefixOperator(const ValuePtr& vPtr) const;
         ValuePtr applyMinusPrefixOperator(const ValuePtr& vPtr) const;

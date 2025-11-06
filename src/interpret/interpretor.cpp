@@ -15,16 +15,13 @@
 #include "conkey/parser/ast/statements/return_statement.hpp"
 #include <cstdint>
 #include <memory>
+#include <numbers>
 
 
 namespace Conkey::Interpret {
 
     ValuePtr Interpretor::visitProgram(Parser::Program& programRef) {
-        ValuePtr returnValue;
-        for (const auto& statement : programRef.statements_) {
-            returnValue = statement->accept(*this);
-        }
-        return returnValue;
+        return evaluateStatements(programRef.statements_);
     }
 
     ValuePtr Interpretor::visitBooleanLiteral(Parser::BooleanLiteral& expRef) {
@@ -44,7 +41,14 @@ namespace Conkey::Interpret {
     }
 
     ValuePtr Interpretor::visitIfExpression(Parser::IfExpression& expRef) {
-        return this->NULL_VALUE_PTR;
+        auto conditionValue = expRef.condition_->accept(*this);
+        if (isTruthy(conditionValue)) {
+            return expRef.consequence_->accept(*this);
+        } else if (expRef.alternative_) {
+            return expRef.alternative_->accept(*this);
+        }
+
+        return NULL_VALUE_PTR;
     }
 
     ValuePtr Interpretor::visitInfixExpression(Parser::InfixExpression& expRef) {
@@ -70,7 +74,7 @@ namespace Conkey::Interpret {
     }
 
     ValuePtr Interpretor::visitBlockStatement(Parser::BlockStatement& stmntRef) {
-        return this->NULL_VALUE_PTR;
+        return evaluateStatements(stmntRef.statements_);
     }
 
     ValuePtr Interpretor::visitExpressionStatement(Parser::ExpressionStatement& stmntRef) {
@@ -146,5 +150,23 @@ namespace Conkey::Interpret {
             return NULL_VALUE_PTR;
         }
 
+        ValuePtr Interpretor::evaluateStatements(const std::vector<Parser::StatementPtr>& stmnts) {
+            ValuePtr returnValue;
+            for (const auto& statement : stmnts) {
+                returnValue = statement->accept(*this);
+            }
+            return returnValue;
+        }
 
+        bool Interpretor::isTruthy(const ValuePtr& valuePtr) const {
+            auto valueType = valuePtr->valueType();
+            switch(valueType) {
+                case ValueType::BOOLEAN_VALUE:
+                    return static_cast<BooleanValue*>(valuePtr.get())->value_;
+                case ValueType::NULL_VALUE:
+                    return false;
+                default:
+                    return true;
+            }
+        }
 }
