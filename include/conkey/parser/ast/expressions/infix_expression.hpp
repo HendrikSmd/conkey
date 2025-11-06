@@ -6,6 +6,12 @@
 
 namespace Conkey::Parser {
 
+    enum class InfixOperator {
+        ADD, MINUS, ASTERISK, SLASH, GREATER_THAN, LESS_THAN, EQUAL, NOT_EQUAL
+    };
+
+    std::string to_string(const InfixOperator& op);
+
     class InfixExpression : public Expression {
         public:
         ~InfixExpression() override = default;
@@ -14,7 +20,7 @@ namespace Conkey::Parser {
 
         Interpret::ValuePtr accept(Interpret::Visitor<Interpret::ValuePtr>& visitor) override;
 
-        std::string operatorLiteral_;
+        InfixOperator operator_;
         ExpressionPtr left_;
         ExpressionPtr right_;
     };

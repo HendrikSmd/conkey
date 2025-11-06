@@ -48,7 +48,9 @@ namespace Conkey::Interpret {
     }
 
     ValuePtr Interpretor::visitInfixExpression(Parser::InfixExpression& expRef) {
-        return this->NULL_VALUE_PTR;
+        auto leftValue = expRef.left_->accept(*this);
+        auto rightValue = expRef.right_->accept(*this);
+        return applyInfixOperator(expRef.operator_, leftValue, rightValue);
     }
 
     ValuePtr Interpretor::visitIntegerLiteral(Parser::IntegerLiteral& expRef) {
@@ -106,5 +108,43 @@ namespace Conkey::Interpret {
                 return NULL_VALUE_PTR;
         }
     }
+
+    ValuePtr Interpretor::applyInfixOperator(
+        const Parser::InfixOperator& op,
+        const ValuePtr& leftValuePtr,
+        const ValuePtr& rightValuePtr) const {
+            if (leftValuePtr->valueType() == ValueType::INTEGER_VALUE && rightValuePtr->valueType() == ValueType::INTEGER_VALUE) {
+                int64_t leftInt = static_cast<IntegerValue*>(leftValuePtr.get())->value_;
+                int64_t rightInt = static_cast<IntegerValue*>(rightValuePtr.get())->value_;
+                switch(op) {
+                    case Conkey::Parser::InfixOperator::ADD:
+                        return std::make_shared<IntegerValue>(leftInt + rightInt);
+                    case Conkey::Parser::InfixOperator::MINUS:
+                        return std::make_shared<IntegerValue>(leftInt - rightInt);
+                    case Conkey::Parser::InfixOperator::ASTERISK:
+                        return std::make_shared<IntegerValue>(leftInt * rightInt);
+                    case Conkey::Parser::InfixOperator::SLASH:
+                        return std::make_shared<IntegerValue>(leftInt / rightInt);
+                    case Conkey::Parser::InfixOperator::GREATER_THAN:
+                        return leftInt > rightInt ? TRUE_VALUE_PTR : FALSE_VALUE_PTR;
+                    case Conkey::Parser::InfixOperator::LESS_THAN:
+                        return leftInt < rightInt ? TRUE_VALUE_PTR : FALSE_VALUE_PTR;
+                    case Conkey::Parser::InfixOperator::EQUAL:
+                        return leftInt == rightInt ? TRUE_VALUE_PTR : FALSE_VALUE_PTR;
+                    case Conkey::Parser::InfixOperator::NOT_EQUAL:
+                        return leftInt != rightInt ? TRUE_VALUE_PTR : FALSE_VALUE_PTR;
+                }
+            } else if (leftValuePtr->valueType() == ValueType::BOOLEAN_VALUE && rightValuePtr->valueType() == ValueType::BOOLEAN_VALUE) {
+                switch(op) {
+                    case Conkey::Parser::InfixOperator::EQUAL:
+                        return leftValuePtr == rightValuePtr ? TRUE_VALUE_PTR : FALSE_VALUE_PTR;
+                    case Conkey::Parser::InfixOperator::NOT_EQUAL:
+                        return leftValuePtr != rightValuePtr ? TRUE_VALUE_PTR : FALSE_VALUE_PTR;
+                }
+            }
+
+            return NULL_VALUE_PTR;
+        }
+
 
 }

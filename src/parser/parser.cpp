@@ -250,7 +250,34 @@ namespace Conkey::Parser {
 
     ExpressionPtr Parser::parseInfixExpression(ExpressionPtr left) {
         InfixExpressionPtr exprPtr = std::make_unique<InfixExpression>();
-        exprPtr->operatorLiteral_ = currentToken_.literal;
+        switch(currentToken_.type) {
+            case Lexer::TokenType::PLUS:
+                exprPtr->operator_ = InfixOperator::ADD;
+                break;
+            case Lexer::TokenType::MINUS:
+                exprPtr->operator_ = InfixOperator::MINUS;
+                break;
+            case Lexer::TokenType::ASTERISK:
+                exprPtr->operator_ = InfixOperator::ASTERISK;
+                break;
+            case Lexer::TokenType::SLASH:
+                exprPtr->operator_ = InfixOperator::SLASH;
+                break;
+            case Lexer::TokenType::GT:
+                exprPtr->operator_ = InfixOperator::GREATER_THAN;
+                break;
+            case Lexer::TokenType::LT:
+                exprPtr->operator_ = InfixOperator::LESS_THAN;
+                break;
+            case Lexer::TokenType::EQ:
+                exprPtr->operator_ = InfixOperator::EQUAL;
+                break;
+            case Lexer::TokenType::NOT_EQ:
+                exprPtr->operator_ = InfixOperator::NOT_EQUAL;
+                break;
+            default:
+                throw new ParseError("Tried to parse an infix expression with the unrecognized infix operator" + currentToken_.literal);
+        }
         exprPtr->left_  = std::move(left);
         // left == nullptr, from here
         OperatorPrecedence precedence = getOperatorPrecedence(currentToken_.type);

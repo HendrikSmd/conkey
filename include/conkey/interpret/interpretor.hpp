@@ -3,6 +3,7 @@
 
 #include "conkey/interpret/values.hpp"
 #include "conkey/interpret/visitor.hpp"
+#include "conkey/parser/ast/expressions/infix_expression.hpp"
 #include <memory>
 
 namespace Conkey::Interpret {
@@ -36,6 +37,7 @@ namespace Conkey::Interpret {
 
         ValuePtr applyBangPrefixOperator(const ValuePtr& vPtr) const;
         ValuePtr applyMinusPrefixOperator(const ValuePtr& vPtr) const;
+        ValuePtr applyInfixOperator(const Parser::InfixOperator& op, const ValuePtr& leftValue, const ValuePtr& rightValue) const;
     };
 
 
